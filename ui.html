@@ -1,17 +1,504 @@
-<h2>Rectangle Creator</h2>
-<p>Count: <input id="count" value="5"></p>
-<button id="create">Create</button>
-<button id="cancel">Cancel</button>
+<head>
+  <meta charset="UTF-8">
+  <title>Grid Creator</title>
+  <link rel="stylesheet" href="styles/style.css">
+</head>
+
+
+<!-- <span class="title">Grid Creator</span> -->
+
+
+
+<!-- Config container 1: Paper seleciton / Type area -->
+<div class="config-container">
+  <div class="segment-container" id="seg-pp">
+    <span class="toggle-indicator"> ▲ </span>
+    <span> Paper selection / Type area </span>
+  </div>
+
+  <div class="config-body">
+
+    <div class="config-item-container">
+      <label for="paper-select">Paper</label>
+      <select name="paper" id="paper-select">
+        <option value="">--Choose an option--</option>
+        <option value="a4">A4</option>
+        <option value="a5">A5</option>
+        <option value="a6">A6</option>
+
+      </select>
+    </div>
+
+    <div class="config-item-container">
+      <label for="orient-select">Orient</label>
+      <select name="orient" id="orient-select">
+        <option value="">--Choose an option--</option>
+        <option value="landscape">Landscape</option>
+        <option value="portrait">Portrait</option>
+      </select>
+    </div>
+
+
+    <div class="sub-module-container">
+      <div class="sub-module-header">
+        <div class="sub-module-header-inner">
+          <div class="config-item-container">
+            <label for="type-area-select">Type area</label>
+            <select name="type-area" id="type-area-select">
+              <option value="">--Choose an option--</option>
+              <option value="golden-ratio">Golden ratio</option>
+              <option value="customize">Customize</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="sub-module-body">
+        <div class="config-item-container" id="margin-preset-container" style="display: none;">
+          <label for="margin-preset-select">Preset</label>
+          <select name="margin-preset" id="margin-preset-select">
+            <option value="">--Choose an option--</option>
+            <option value="narrow">Narrow</option>
+            <option value="moderate">Moderate</option>
+            <option value="normal">Normal</option>
+            <option value="wide">Wide</option>
+          </select>
+        </div>
+        <div class="config-item-container">
+          <label for="margin-input">Margins</label>
+          <div class="muti-input-container" id="margin-input">
+            <input type="text" name="head-input" placeholder="head">
+            <input type="text" name="tail-input" placeholder="tail">
+            <input type="text" name="left-input" placeholder="left">
+            <input type="text" name="right-input" placeholder="right">
+          </div>
+        </div>
+
+        <img id="img-orient" src="pic/portrait.png" style="display: block;
+  margin: 4px auto;">
+        <div class="config-item-container">
+          <div class="muti-button-container">
+            <button id="btn-modify">Modify</button>
+            <button id="btn-reset">Reset</button>
+          </div>
+        </div>
+      </div>
+      <div class="sub-module-footer">
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- Config container 2: Columns / grid modules -->
+<div class="config-container">
+  <div class="segment-container" id="seg-cl">
+    <span class="toggle-indicator"> ▲ </span>
+    <span> Columns / grid modules </span>
+  </div>
+
+  <div class="config-body">
+
+    <div class="config-item-container">
+      <label for="colum-num-input">Col num</label>
+      <input type="text" name="colum-num-input">
+    </div>
+
+    <div class="config-item-container">
+      <label for="column-gap-input">Col gap</label>
+      <input type="text" name="columns-gap-input">
+    </div>
+
+    <div class="config-item-container">
+      <label for="grid-num-input">Grid num</label>
+      <input type="text" name="grid-num-input">
+    </div>
+
+    <div class="config-item-container">
+      <label for="grid-gap-input">Grid gap</label>
+      <input type="text" name="grid-gap-input">
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<!-- Config container 3: Font size / line height -->
+<div class="config-container">
+  <div class="segment-container" id="seg-fs">
+    <span class="toggle-indicator"> ▲ </span>
+    <span> Typography settings </span>
+  </div>
+
+  <div class="config-body">
+
+    <div class="config-item-container">
+      <label for="columns-input">Font size</label>
+      <input type="text" name="fontsize-input">
+    </div>
+
+    <div class="config-item-container">
+      <label for="columns-input">Line height</label>
+      <input type="text" name="lineheight-input">
+    </div>
+
+    <div class="config-item-container">
+      <label for="cap-height-input">Cap height</label>
+      <input type="text" name="capheight-input" placeholder="Keep default if 'Cap height' is disabled.">
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Message box -->
+<div class="message-box">
+  <div class="label">Message box</div>
+  <div class="message-output" id="msg-output"></div>
+</div>
+
+<!-- Final operation -->
+<div class="config-item-container" style="padding: 0px;margin: 0px;">
+  <div class="muti-button-container">
+    <button name="btn-calculate">Calculate</button>
+    <button name="btn-adjust">Adjust</button>
+    <button name="btn-generate">Generate</button>
+  </div>
+</div>
+
+
+
 <script>
+  // var
+  var pageWidth;
+  var pageHeight;
 
-document.getElementById('create').onclick = () => {
-  const textbox = document.getElementById('count');
-  const count = parseInt(textbox.value, 10);
-  parent.postMessage({ pluginMessage: { type: 'create-rectangles', count } }, '*')
-}
+  // segment
+  const segPp = document.getElementById('seg-pp')
+  const segCl = document.getElementById('seg-cl')
+  const segFs = document.getElementById('seg-fs')
 
-document.getElementById('cancel').onclick = () => {
-  parent.postMessage({ pluginMessage: { type: 'cancel' } }, '*')
-}
+  // select
+  const slcPaper = document.getElementById('paper-select')
+  const slcOrient = document.getElementById('orient-select')
+  const slcTypeArea = document.getElementById('type-area-select')
+  const slcMarginPreset = document.getElementById('margin-preset-select')
+
+  // input
+  const arrInputMargin = Array.from(document.getElementById('margin-input').querySelectorAll('input'))
+
+  // image
+  const imgOrient = document.getElementById('img-orient')
+
+  // button
+  const btnModify = document.getElementById('btn-modify')
+  const btnReset = document.getElementById('btn-reset')
+  const btnCalculate = document.querySelector('button[name="btn-calculate"]');
+  const btnAdjust = document.querySelector('button[name="btn-adjust"]');
+  const btnGenerate = document.querySelector('button[name="btn-generate"]');
+
+  // div
+  const divMarginPreset = document.getElementById('margin-preset-container')
+
+
+
+
+
+  segPp.addEventListener("click", toggleSegment.bind(segPp))
+  segCl.addEventListener("click", toggleSegment.bind(segCl))
+  segFs.addEventListener("click", toggleSegment.bind(segFs))
+
+  btnCalculate.addEventListener("click", calculate)
+
+
+
+
+  // 修改margin input的可编辑性
+  function disabledMarginInput(disabled) {
+    arrInputMargin.forEach(input => {
+      input.disabled = disabled
+    });
+  }
+
+  //版面大小切换
+  slcPaper.addEventListener("change", function () {
+    // 更新margin
+    updateMargin();
+    // 禁用输入
+    disabledMarginInput(true);
+  });
+
+  // 版面方向切换
+  slcOrient.addEventListener("change", function () {
+    const selectedOption = slcOrient.value;
+
+    switch (selectedOption) {
+      case "landscape":
+        imgOrient.src = "pic/landscape.png"
+        break;
+
+      case "portrait":
+        imgOrient.src = "pic/portrait.png"
+        break;
+
+      default:
+        break;
+    }
+    // 更新页面宽高
+    updatePageSpec();
+  });
+
+  // 版心变距类型切换
+  slcTypeArea.addEventListener("change", function () {
+    const selectedOption = slcTypeArea.value;
+
+    switch (selectedOption) {
+
+      case "golden-ratio":
+        // 显示预设选择
+        divMarginPreset.style.display = "flex";
+
+        // 禁用输入
+        disabledMarginInput(true);
+        break;
+
+      case "customize":
+        // 隐藏预设选择
+        divMarginPreset.style.display = "none";
+
+        // 解除禁用输入
+        disabledMarginInput(false);
+        break;
+
+      default:
+        // 隐藏预设选择
+        divMarginPreset.style.display = "none";
+        break;
+    }
+  })
+
+  // 版心边距预设切换
+  slcMarginPreset.addEventListener("change", function () {
+    // 更新边距
+    updateMargin();
+    // 禁用输入
+    disabledMarginInput(true);
+  });
+
+  // 更新页边距
+  function updateMargin(params) {
+    const marginPresetSelectValue = slcMarginPreset.value;
+    const paperSelectValue = slcPaper.value;
+
+    var inputHead = arrInputMargin[0];
+    var inputTail = arrInputMargin[1];
+    var inputLeft = arrInputMargin[2];
+    var inputRight = arrInputMargin[3];
+
+    let newValue = [];
+
+
+    switch (marginPresetSelectValue) {
+      case 'narrow':
+        switch (paperSelectValue) {
+          case "a4":
+            newValue = [60, 96, 60, 36];
+            break;
+          case "a5":
+            newValue = [40, 64, 40, 24];
+            break;
+          case "a6":
+            newValue = [30, 48, 30, 18];
+            break;
+        }
+
+        break;
+      case 'moderate':
+        switch (paperSelectValue) {
+          case "a4":
+            newValue = [80, 128, 80, 48];
+            break;
+          case "a5":
+            newValue = [60, 96, 60, 36];
+            break;
+          case "a6":
+            newValue = [40, 64, 40, 24];
+            break;
+        }
+        break;
+      case 'normal':
+        switch (paperSelectValue) {
+          case "a4":
+            newValue = [100, 160, 100, 60];
+            break;
+          case "a5":
+            newValue = [70, 112, 70, 42];
+            break;
+          case "a6":
+            newValue = [50, 80, 50, 30];
+            break;
+        }
+        break;
+      case 'wide':
+        switch (paperSelectValue) {
+          case "a4":
+            newValue = [120, 192, 120, 72];
+            break;
+          case "a5":
+            newValue = [80, 128, 80, 48];
+            break;
+          case "a6":
+            newValue = [60, 96, 60, 36];
+            break;
+        }
+        break;
+      default:
+        break;
+    }
+
+    if (marginPresetSelectValue !== '') {
+      inputHead.value = newValue[0];
+      inputTail.value = newValue[1];
+      inputLeft.value = newValue[2];
+      inputRight.value = newValue[3];
+    } else {
+      arrInputMargin.forEach(input => {
+        input.value = '';
+      })
+    }
+
+  }
+
+
+  // 更新页面宽高
+  function updatePageSpec(params) {
+    const paperSelectValue = slcPaper.value;
+    const selectedOption = slcOrient.value;
+
+    switch (paperSelectValue) {
+      case "a4":
+        pageWidth = 595;
+        pageHeight = 842;
+        break;
+      case "a5":
+        pageWidth = 420;
+        pageHeight = 595;
+        break;
+      case "a6":
+        pageWidth = 297;
+        pageHeight = 420;
+        break;
+    }
+
+    switch (selectedOption) {
+      case "landscape":
+        if (pageHeight > pageWidth) {
+          [pageHeight, pageWidth] = [pageWidth, pageHeight]
+        }
+        break;
+
+      case "":
+      case "portrait":
+        if (pageHeight < pageWidth) {
+          [pageHeight, pageWidth] = [pageWidth, pageHeight]
+        }
+        break;
+
+      default:
+        break;
+    }
+  }
+
+  // 点击modify：修改边距
+  btnModify.addEventListener("click", function () {
+    if (slcTypeArea.value === "golden-ratio") {
+      // 解除input禁用
+      arrInputMargin.forEach(input => {
+        input.disabled = false
+      });
+    }
+    // 聚焦到第一个input，进入编辑状态
+    arrInputMargin[0].focus();
+  });
+
+  // 点击reset：重置边距
+  btnReset.addEventListener("click", function () {
+    if (slcTypeArea.value === "golden-ratio") {
+      // 若是选择黄金比例边距
+      // 则修改值为默认黄金比例边距
+      updateMargin();
+      // 禁用输入
+      disabledMarginInput(true);
+    } else {
+      // 若是自定义边距
+      // 则清除所有边距值
+      arrInputMargin.forEach(input => {
+        input.value = '';
+      });
+    }
+  });
+
+
+  function toggleSegment(params) {
+    // 角标旋转方向切换
+    {
+      var tgIdct = this.querySelector(".toggle-indicator");
+      var currentRotation = tgIdct.style.transform;
+      var match = /rotate\((\d+)deg\)/.exec(currentRotation);
+      var currentAngle = match ? parseInt(match[1]) : 0;
+      var nextAngle = (currentAngle === 0 || currentAngle === 180) ? 90 : 180;
+      tgIdct.style.transform = "rotate(" + nextAngle + "deg)";
+    }
+
+    // 内容显示切换
+    {
+      var cfBody = this.parentElement.querySelector(".config-body");
+      var currentVisibility = cfBody.style.display;
+      var nextVisibility = currentVisibility === "none" ? "flex" : "none";
+      cfBody.style.display = nextVisibility;
+    }
+
+  }
+
+  function calculate() {
+
+    var gridHeight
+    var gridNum = Number(document.querySelector('input[name="grid-num-input"]').value)
+    var gridGap = Number(document.querySelector('input[name="grid-gap-input"]').value)
+
+    var marginTop = Number(document.querySelector('input[name="head-input"]').value)
+    var marginBottom = Number(document.querySelector('input[name="tail-input"]').value)
+    var marginLeft = Number(document.querySelector('input[name="left-input"]').value)
+    var marginRight = Number(document.querySelector('input[name="right-input"]').value)
+
+
+    let A = gridNum
+    let B = gridGap * (gridNum - 1) - pageHeight + marginTop + marginBottom
+
+
+    console.log(isNaN(A), isNaN(A));
+
+    if (isNaN(A) || isNaN(B)) {
+      document.getElementById("msg-output").innerHTML = "nonono"
+    } else {
+      document.getElementById("msg-output").innerHTML = solveInequality(A, B)
+    }
+  }
+
+
+
+
+  // 求解 AX + B <= 0
+  function solveInequality(A, B) {
+    var solution = -B / A;
+    if (solution >= 0) {
+      return solution;
+    } else {
+      return "错误：不等式的解为负数。";
+    }
+  }
 
 </script>
