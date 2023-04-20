@@ -102,12 +102,12 @@
 
     <div class="config-item-container">
       <label for="colum-num-input">Col num</label>
-      <input type="text" name="colum-num-input">
+      <input type="text" name="col-num-input">
     </div>
 
     <div class="config-item-container">
       <label for="column-gap-input">Col gap</label>
-      <input type="text" name="columns-gap-input">
+      <input type="text" name="col-gap-input">
     </div>
 
     <div class="config-item-container">
@@ -134,11 +134,6 @@
   </div>
 
   <div class="config-body">
-
-    <div class="config-item-container">
-      <label for="columns-input">Font size</label>
-      <input type="text" name="fontsize-input">
-    </div>
 
     <div class="config-item-container">
       <label for="columns-input">Line height</label>
@@ -172,6 +167,9 @@
 
 
 <script>
+  // map
+  const valMap = new Map()
+
   // var
   var pageWidth;
   var pageHeight;
@@ -203,7 +201,8 @@
   // div
   const divMarginPreset = document.getElementById('margin-preset-container')
 
-
+  // msg output
+  var msgOuput = document.getElementById("msg-output")
 
 
 
@@ -212,7 +211,7 @@
   segFs.addEventListener("click", toggleSegment.bind(segFs))
 
   btnCalculate.addEventListener("click", calculate)
-
+  btnGenerate.addEventListener("click", generate)
 
 
 
@@ -465,7 +464,56 @@
 
   function calculate() {
 
-    var gridHeight
+    // 更新值表
+    updateValueMap();
+
+
+    let A = valMap.get('gridNum')
+    let B = valMap.get('gridGap') * (valMap.get('gridNum') - 1) - valMap.get('pageHeight') + valMap.get('marginTop') + valMap.get('marginBottom')
+
+    // 解不等式求gridHeight原始值
+    let gridHeight = solveInequality(A, B)
+    // 保存gridHeight原始值
+    updateValue("gridHeight", gridHeight)
+
+
+    A = valMap.get('colNum')
+    B = valMap.get('colGap') * (valMap.get('colNum') - 1) - valMap.get('pageWidth') + valMap.get('marginLeft') + valMap.get('marginRight')
+
+    // 解不等式求colWidth原始值
+    let colWidth = solveInequality(A, B)
+    // 保存colWidth原始值
+    updateValue("colWidth", colWidth)
+
+    // 输出消息
+    msgOuputAppend("[ Calculate ]<br>")
+    msgOuputAppend("The original value of gridHeight is " + gridHeight + ";<br>")
+    msgOuputAppend("The original value of colWidth is " + colWidth + ";<br>")
+
+
+  }
+
+  function adjust(params) {
+
+    if (isNaN(valMap.get('capHeight')) || valMap.get('capHeight') === 0) {
+      // capHeight is not a number 不考虑cap height
+      msgOuputAppend("If you don't consider CAP HEIGHT,<br>")
+      gridHeight = round(gridHeight, valMap.get('lineHeight'))
+    } else {
+      //考虑cap height 
+      msgOuputAppend("The current cap height value is " + valMap.get('capHeight') + ",<br>")
+      gridHeight = round(gridHeight - 2 * valMap.get('capHeight'), valMap.get('lineHeight')) + 2 * valMap.get('capHeight')
+    }
+
+    msgOuputAppend("The adjusted gridHeight value is " + gridHeight + ";<br>")
+    // updateValue('gridHeight', gridHeight)
+    // console.log(gridHeight);
+  }
+
+  function updateValueMap(params) {
+    var colNum = Number(document.querySelector('input[name="col-num-input"]').value)
+    var colGap = Number(document.querySelector('input[name="col-gap-input"]').value)
+
     var gridNum = Number(document.querySelector('input[name="grid-num-input"]').value)
     var gridGap = Number(document.querySelector('input[name="grid-gap-input"]').value)
 
@@ -474,22 +522,41 @@
     var marginLeft = Number(document.querySelector('input[name="left-input"]').value)
     var marginRight = Number(document.querySelector('input[name="right-input"]').value)
 
+    var lineHeight = Number(document.querySelector('input[name="lineheight-input"]').value)
+    var capHeight = Number(document.querySelector('input[name="capheight-input"]').value)
 
-    let A = gridNum
-    let B = gridGap * (gridNum - 1) - pageHeight + marginTop + marginBottom
+    valMap.set('pageWidth', pageWidth)
+    valMap.set('pageHeight', pageHeight)
+    valMap.set('colNum', colNum)
+    valMap.set('colGap', colGap)
+    valMap.set('gridNum', gridNum)
+    valMap.set('gridGap', gridGap)
+    valMap.set('marginTop', marginTop)
+    valMap.set('marginBottom', marginBottom)
+    valMap.set('marginLeft', marginLeft)
+    valMap.set('marginRight', marginRight)
+    valMap.set('lineHeight', lineHeight)
+    valMap.set('capHeight', capHeight)
 
-
-    console.log(isNaN(A), isNaN(A));
-
-    if (isNaN(A) || isNaN(B)) {
-      document.getElementById("msg-output").innerHTML = "nonono"
-    } else {
-      document.getElementById("msg-output").innerHTML = solveInequality(A, B)
-    }
+    valMap.set('gridHeight')
+    valMap.set('colWidth')
   }
 
+  function msgOuputAppend(str) {
+    msgOuput.innerHTML += str
+  }
 
+  function updateValue(key, val) {
+    valMap.set(key, val)
+  }
 
+  function generate(params) {
+    parent.postMessage({ pluginMessage: 'anything here' }, '*')
+  }
+
+  function round(dividend, divisor) {
+    return Math.round(dividend / divisor) * divisor
+  }
 
   // 求解 AX + B <= 0
   function solveInequality(A, B) {
@@ -497,8 +564,9 @@
     if (solution >= 0) {
       return solution;
     } else {
-      return "错误：不等式的解为负数。";
+      return "Error, solution value is negative.";
     }
   }
 
+</script>
 </script>
